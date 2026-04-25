@@ -1,13 +1,13 @@
-# 🚀 Akselerasi Simulasi Monte Carlo dengan OpenMP untuk Estimasi Value at Risk (VaR)
+# Akselerasi Simulasi Monte Carlo dengan OpenMP untuk Estimasi Value at Risk (VaR)
 
-## 📌 Deskripsi Proyek
+## Deskripsi Proyek
 Proyek ini bertujuan untuk mengakselerasi perhitungan Value at Risk (VaR) pada portofolio investasi multiaset menggunakan Simulasi Monte Carlo yang diparalelkan dengan OpenMP.
 
 Metode Monte Carlo dikenal memiliki akurasi tinggi dalam estimasi risiko, namun membutuhkan komputasi besar karena melibatkan ribuan hingga jutaan iterasi. Oleh karena itu, komputasi paralel digunakan untuk meningkatkan performa dan efisiensi.
 
 ---
 
-## 🎯 Tujuan
+## Tujuan
 - Mengimplementasikan simulasi Monte Carlo untuk estimasi VaR
 - Mengidentifikasi bottleneck pada proses komputasi
 - Menerapkan paralelisasi menggunakan OpenMP
@@ -24,7 +24,7 @@ Metode Monte Carlo dikenal memiliki akurasi tinggi dalam estimasi risiko, namun 
 
 ---
 
-## 🧠 Konsep Utama
+## Konsep Utama
 
 ### 1. Value at Risk (VaR)
 VaR adalah ukuran statistik untuk memperkirakan kerugian maksimum dalam periode tertentu dengan tingkat kepercayaan tertentu.
@@ -37,7 +37,7 @@ Digunakan untuk membagi beban simulasi ke beberapa thread sehingga mempercepat e
 
 ---
 
-## 🏗️ Alur Sistem
+## Alur Sistem
 1. Input data harga historis aset  
 2. Menghitung return masing-masing aset  
 3. Simulasi Monte Carlo (generate random return)  
@@ -48,14 +48,14 @@ Digunakan untuk membagi beban simulasi ke beberapa thread sehingga mempercepat e
 
 ---
 
-## 🔥 Bottleneck
+## Bottleneck
 - Proses simulasi berulang (loop besar)
 - Waktu komputasi tinggi pada eksekusi serial
 - Skalabilitas terbatas tanpa paralelisme
 
 ---
 
-## ⚡ Solusi
+## Solusi
 Menggunakan OpenMP untuk:
 - Paralelisasi loop simulasi
 - Distribusi workload ke multiple thread
@@ -63,7 +63,7 @@ Menggunakan OpenMP untuk:
 
 ---
 
-## 📊 Evaluasi Kinerja
+## Evaluasi Kinerja
 
 ### Speedup
 ```
@@ -77,7 +77,7 @@ Efficiency = Speedup / Jumlah Thread
 
 ---
 
-## 📈 Hasil yang Diharapkan
+## Hasil yang Diharapkan
 - Penurunan waktu komputasi secara signifikan
 - Speedup mendekati linear
 - Efisiensi penggunaan thread tinggi
@@ -85,7 +85,7 @@ Efficiency = Speedup / Jumlah Thread
 
 ---
 
-## ▶️ Cara Menjalankan
+## Cara Menjalankan
 
 ### Compile
 ```
@@ -99,7 +99,7 @@ gcc -fopenmp main.c -o var_simulation
 
 ---
 
-## 📁 Struktur Folder (Contoh)
+## Struktur Folder (Contoh)
 ```
 ├── main.c
 ├── data/
@@ -113,14 +113,14 @@ gcc -fopenmp main.c -o var_simulation
 
 ---
 
-## 📚 Referensi
+## Referensi
 - Monte Carlo Simulation untuk VaR
 - Parallel Computing dengan OpenMP
 - Literatur terkait Value at Risk
 
 ---
 
-## 👨‍💻 Author
+## Author
 Fredrik Danielsen  
 Benaya Abelio
 Jonathan Sugan
@@ -128,7 +128,7 @@ Muhamad Ridha Safari
 
 ---
 
-## 💡 Catatan
+## Catatan
 Proyek ini dapat dikembangkan lebih lanjut dengan:
 - Implementasi GPU (CUDA)
 - Penggunaan dataset real-time
