@@ -16,7 +16,7 @@ Metode Monte Carlo dikenal memiliki akurasi tinggi dalam estimasi risiko, namun 
 
 ---
 
-## ⚙️ Teknologi yang Digunakan
+## Teknologi yang Digunakan
 - Bahasa Pemrograman: C / C++
 - Parallel Computing: OpenMP
 - Compiler: GCC (dengan flag -fopenmp)
