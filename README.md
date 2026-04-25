@@ -122,7 +122,9 @@ gcc -fopenmp main.c -o var_simulation
 
 ## 👨‍💻 Author
 Fredrik Danielsen  
-Informatics Engineering Student  
+Benaya Abelio
+Jonathan Sugan
+Muhamad Ridha Safari
 
 ---
 
