@@ -27,9 +27,14 @@
 *.lib
 
 # Executables
+bin/
 *.exe
 *.out
 *.app
+
+# Python cache
+__pycache__/
+.ipynb_checkpoints/
 
 # IDE - Visual Studio Code
 .vscode/
@@ -49,6 +54,6 @@ bin/
 cmake-build-*/
 
 # Data & Logs
-*.csv
+# *.csv
 *.log
 !data/sample_input.csv # Kecuali file contoh data
