@@ -2,6 +2,16 @@
 #define SIMULATION_HPP
 
 #include <vector>
+struct SimulationResult {
+    double var_parallel;
+    double var_sequential;
+    double time_parallel;
+    double time_sequential;
+    double average_portfolio_return;
+    int failed_simulations;
+}
+    
+
 
 class MonteCarloSimulation {
 public:
