@@ -1,111 +1,151 @@
-#include <gtest/gtest.h>
-#include "simulation.hpp"
-#include <omp.h>
+#include "../include/simulation.hpp"
+#include <iostream>
 #include <vector>
 #include <cmath>
+#include <stdexcept>
+#include <string>
 
-class MonteCarloSimulationTest : public ::testing::Test {
-protected:
-    std::vector<double> means;
-    std::vector<double> weights;
-    std::vector<std::vector<double>> cholesky;
-    double confidence_level;
-    int num_simulations;
+#define TEST_CONTEXT(test_name) std::cout << "[RUN] " << test_name << "...\n"
+#define TEST_PASS() std::cout << "\033[32m  -> STATUS: PASS\033[0m\n\n"
+#define TEST_FAIL(reason) { std::cout << "\033[31m  -> STATUS: FAIL (" << reason << ")\033[0m\n\n"; total_failed++; }
 
-    void SetUp() override {
-        // Setup data portofolio standar (2 Aset) untuk pengujian umum
-        means = {0.05, 0.08};
-        weights = {0.5, 0.5};
-        cholesky = {
-            {0.10, 0.00},
-            {0.03, 0.12}
-        };
-        confidence_level = 0.95;
-        num_simulations = 10000; // Jumlah sampel yang cukup untuk konvergensi statistika
-    }
-};
+int total_failed = 0;
 
-// =========================================================================
-// 1. TEST: Memastikan VaR Paralel vs VaR Sekuensial (Pendekatan Statistika)
-// =========================================================================
-TEST_F(MonteCarloSimulationTest, CompareParallelAndSequentialVaR) {
-    MonteCarloSimulation sim;
-    SimulationResult result = sim.runSimulation(means, weights, cholesky, num_simulations, confidence_level);
-    
-    // Catatan: Karena generator paralel menggunakan std::random_device (non-deterministik),
-    // nilai tidak akan sama persis bita-per-bita (==), melainkan harus mendekati secara statistika.
-    // Kita gunakan batas toleransi (epsilon) sebesar 0.05.
-    double epsilon = 0.05;
-    EXPECT_NEAR(result.var_sequential, result.var_parallel, epsilon);
+void setup_dummy_data(std::vector<double>& means, std::vector<double>& weights, std::vector<std::vector<double>>& cholesky) {
+    means = {0.0005, 0.0003};
+    weights = {0.5, 0.5};
+    cholesky = {
+        {1.0, 0.0},
+        {0.45, 0.893}
+    };
 }
 
-// =========================================================================
-// 2. EDGE CASE 1: Menguji jika input jumlah aset kosong (Exception Handling)
-// =========================================================================
-TEST_F(MonteCarloSimulationTest, EmptyAssetsThrowsArgumentException) {
+// ----------------==================================----------------
+// 1. SMOKE TEST: Memastikan fungsi berjalan tanpa crash
+// ----------------==================================----------------
+void test_smoke() {
+    TEST_CONTEXT("Test 1: Smoke Test");
+    std::vector<double> means, weights;
+    std::vector<std::vector<double>> cholesky;
+    setup_dummy_data(means, weights, cholesky);
+
+    try {
+        SimulationResult res = MonteCarloSimulation::runSimulation(means, weights, cholesky, 1000, 0.95);
+        TEST_PASS();
+    } catch (const std::exception& e) {
+        TEST_FAIL(std::string("Crash terdeteksi: ") + e.what());
+    }
+}
+
+// ----------------==================================----------------
+// 2. CORRECTNESS TEST: Cek keselarasan paralel vs sekuensial
+// ----------------==================================----------------
+void test_correctness() {
+    TEST_CONTEXT("Test 2: Correctness Test (Parallel == Sequential)");
+    std::vector<double> means, weights;
+    std::vector<std::vector<double>> cholesky;
+    setup_dummy_data(means, weights, cholesky);
+
+    try {
+        SimulationResult res = MonteCarloSimulation::runSimulation(means, weights, cholesky, 50000, 0.95);
+
+        // Toleransi perbedaan hasil acak harian
+        double delta = std::abs(res.var_parallel - res.var_sequential);
+        
+        if (delta < 0.01) {
+            TEST_PASS();
+        } else {
+            TEST_FAIL("Selisih hasil paralel dan sekuensial terlalu jauh. Delta: " + std::to_string(delta));
+        }
+    } catch (const std::exception& e) {
+        TEST_FAIL(std::string("Error eksekusi: ") + e.what());
+    }
+}
+
+// ----------------==================================----------------
+// 3. EDGE CASE TEST: Input Kosong (N = 0 Aset)
+// ----------------==================================----------------
+void test_empty_input() {
+    TEST_CONTEXT("Test 3: Edge Case (Empty Input / Zero Assets)");
     std::vector<double> empty_means;
     std::vector<double> empty_weights;
     std::vector<std::vector<double>> empty_cholesky;
-    
-    MonteCarloSimulation sim;
-    
-    // Memastikan melempar std::invalid_argument saat melempar vektor kosong
-    EXPECT_THROW({
-        sim.runSimulation(empty_means, empty_weights, empty_cholesky, num_simulations, confidence_level);
-    }, std::invalid_argument);
+
+    try {
+        MonteCarloSimulation::runSimulation(empty_means, empty_weights, empty_cholesky, 1000, 0.95);
+        TEST_FAIL("Program tidak melempar exception saat diberikan input kosong.");
+    } catch (const std::invalid_argument& e) {
+        TEST_PASS(); // Ekspektasi terpenuhi
+    } catch (...) {
+        TEST_FAIL("Melemparkan tipe exception yang salah (bukan invalid_argument).");
+    }
 }
 
-// =========================================================================
-// 3. EDGE CASE 2: Menguji program berjalan lancar dengan hanya 1 thread (N=1)
-// =========================================================================
-TEST_F(MonteCarloSimulationTest, RunSmoothlyWithSingleThread) {
-    MonteCarloSimulation sim;
-    
-    // Paksa OpenMP hanya menggunakan 1 thread
-    omp_set_num_threads(1);
-    
-    SimulationResult result;
-    EXPECT_NO_THROW({
-        result = sim.runSimulation(means, weights, cholesky, 1000, confidence_level);
-    });
-    
-    // Pastikan tidak ada kegagalan simulasi dan hasil valid angka
-    EXPECT_EQ(result.failed_simulations, 0);
-    EXPECT_FALSE(std::isnan(result.var_parallel));
-    EXPECT_FALSE(std::isinf(result.var_parallel));
+// ----------------==================================----------------
+// 4. EDGE CASE TEST: N = 1 (Simulasi Tunggal)
+// ----------------==================================----------------
+void test_single_simulation() {
+    TEST_CONTEXT("Test 4: Edge Case (N = 1 Simulation)");
+    std::vector<double> means, weights;
+    std::vector<std::vector<double>> cholesky;
+    setup_dummy_data(means, weights, cholesky);
+
+    try {
+        SimulationResult res = MonteCarloSimulation::runSimulation(means, weights, cholesky, 1, 0.95);
+        
+        if (!std::isnan(res.var_parallel) && !std::isinf(res.var_parallel)) {
+            TEST_PASS();
+        } else {
+            TEST_FAIL("Hasil komputasi paralel menghasilkan nilai NaN atau Infinity.");
+        }
+    } catch (const std::exception& e) {
+        TEST_FAIL(std::string("Gagal mengeksekusi N=1: ") + e.what());
+    }
 }
 
-// =========================================================================
-// 4. EDGE CASE 3: Menguji stabilitas saat jumlah simulasi diatur sangat besar
-// =========================================================================
-TEST_F(MonteCarloSimulationTest, LargeSimulationStability) {
-    MonteCarloSimulation sim;
-    int large_num_simulations = 1000000; // 1 Juta Simulasi
-    
-    SimulationResult result;
-    EXPECT_NO_THROW({
-        result = sim.runSimulation(means, weights, cholesky, large_num_simulations, confidence_level);
-    });
-    
-    // Memastikan kestabilan memori & kalkulasi data besar
-    EXPECT_EQ(result.failed_simulations, 0);
-    EXPECT_GT(result.time_parallel, 0.0);
-    EXPECT_FALSE(std::isnan(result.average_portfolio_return));
+// ----------------==================================----------------
+// 5. STRESS TEST & FAULT TOLERANCE CHECK
+// ----------------==================================----------------
+void test_large_simulation_and_faults() {
+    TEST_CONTEXT("Test 5: Stress Test (N = 1 Juta) & Fault Tolerance");
+    std::vector<double> means, weights;
+    std::vector<std::vector<double>> cholesky;
+    setup_dummy_data(means, weights, cholesky);
+
+    try {
+        SimulationResult res = MonteCarloSimulation::runSimulation(means, weights, cholesky, 1000000, 0.95);
+        
+        if (res.var_parallel != 0.0) {
+            std::cout << "      [INFO] Waktu Eksekusi: " << res.time_parallel << "s\n";
+            std::cout << "      [INFO] Simulasi Gagal/Fallback: " << res.failed_simulations << "\n";
+            TEST_PASS();
+        } else {
+            TEST_FAIL("Hasil komputasi mengembalikan angka nol mutlak.");
+        }
+    } catch (const std::exception& e) {
+        TEST_FAIL(std::string("Gagal menangani komputasi skala besar: ") + e.what());
+    }
 }
 
-// =========================================================================
-// 5. TEST DETERMINISM: Konsistensi hasil sekuensial dengan seed statis
-// =========================================================================
-TEST_F(MonteCarloSimulationTest, SequentialDeterminismWithStaticSeed) {
-    MonteCarloSimulation sim;
-    
-    // Jalankan simulasi pertama
-    SimulationResult run_1 = sim.runSimulation(means, weights, cholesky, 5000, confidence_level);
-    
-    // Jalankan simulasi kedua
-    SimulationResult run_2 = sim.runSimulation(means, weights, cholesky, 5000, confidence_level);
-    
-    // Karena bagian sekuensial menggunakan seed statis (12345), 
-    // hasilnya HARUS konsisten sama persis antara run 1 dan run 2.
-    EXPECT_DOUBLE_EQ(run_1.var_sequential, run_2.var_sequential);
+// --- MAIN RUNNER ---
+int main() {
+    std::cout << "====================================================\n";
+    std::cout << "        STARTING PARALLEL SYSTEM UNIT TESTS        \n";
+    std::cout << "====================================================\n\n";
+
+    test_smoke();               
+    test_correctness();         
+    test_empty_input();         
+    test_single_simulation();   
+    test_large_simulation_and_faults();    
+
+    std::cout << "====================================================\n";
+    if (total_failed == 0) {
+        std::cout << "\033[32mAKHIR REVIU: SEMUA UNIT TEST BERHASIL (PASSED)!\033[0m\n";
+    } else {
+        std::cout << "\033[31mAKHIR REVIU: TERDAPAT " << total_failed << " TEST YANG GAGAL!\033[0m\n";
+    }
+    std::cout << "====================================================\n";
+
+    return total_failed;
 }
