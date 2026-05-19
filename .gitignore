@@ -28,7 +28,7 @@
 
 # Executables
 bin/
-*.exe
+# *.exe
 *.out
 *.app
 
