@@ -45,7 +45,6 @@ if __name__ == "__main__":
     # Memastikan data yang dihasilkan selalu konsisten untuk komparasi performa sekuensial vs paralel 
     np.random.seed(42) 
     
-    # 💡 SKALA DATA UNTUK EKSPERIMEN MINGGU 4 [cite: 841]
     # Skenario 1 (Kecil/Baseline): 50 aset
     # Skenario 2 (Sedang): 500 aset
     # Skenario 3 (Besar/Stress Test): 1000 aset
