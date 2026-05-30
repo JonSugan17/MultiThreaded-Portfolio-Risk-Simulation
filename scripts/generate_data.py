@@ -48,4 +48,4 @@ if __name__ == "__main__":
     # Skenario 1 (Kecil/Baseline): 50 aset
     # Skenario 2 (Sedang): 500 aset
     # Skenario 3 (Besar/Stress Test): 1000 aset
-    generate_synthetic_data(n_assets=500)
+    generate_synthetic_data(n_assets=1000)
