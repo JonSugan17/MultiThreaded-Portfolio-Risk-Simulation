@@ -14,27 +14,38 @@ def generate_synthetic_data(n_assets=10, output_dir="data"):
     # 2. Volatilities (Standar deviasi harian)
     vols = np.random.uniform(0.01, 0.03, n_assets)
 
-    # 3. Weights (Bobot portofolio, total harus 1.0)
+    # 3. Weights (Bobot portofolio menggunakan Dirichlet, total pasti 1.0)
     weights = np.random.dirichlet(np.ones(n_assets), size=1).flatten()
 
     # 4. Correlation Matrix (Harus Positive Semi-Definite)
-    # Membuat matriks random A, lalu A * A^T agar PSD
     A = np.random.rand(n_assets, n_assets)
     cov_matrix = np.dot(A, A.T)
     D = np.sqrt(np.diag(cov_matrix))
     corr_matrix = cov_matrix / np.outer(D, D)
 
-    # 5. Cholesky Decomposition
-    # Kita berikan hasil dekomposisi langsung ke C++ agar lebih cepat
-    # Matriks L dimana L * L^T = Correlation Matrix
-    cholesky_matrix = np.linalg.cholesky(corr_matrix)
+    # 5. Cholesky Decomposition dengan Pengaman Numerik
+    try:
+        cholesky_matrix = np.linalg.cholesky(corr_matrix)
+    except np.linalg.LinAlgError:
+        # Jika matriks gagal didekomposisi karena ketidakakuratan floating-point,
+        # berikan nilai gangguan/jitter sangat kecil pada diagonal utamanya (Ridge Adjustment)
+        print("[!] Menambahkan jitter numerik kecil untuk menstabilkan matriks korelasi...")
+        corr_matrix += np.eye(n_assets) * 1e-8
+        cholesky_matrix = np.linalg.cholesky(corr_matrix)
 
     # Simpan ke CSV
     pd.DataFrame(means, columns=['mean']).to_csv(f"{output_dir}/means.csv", index=False)
     pd.DataFrame(weights, columns=['weight']).to_csv(f"{output_dir}/weights.csv", index=False)
     pd.DataFrame(cholesky_matrix).to_csv(f"{output_dir}/cholesky_matrix.csv", index=False, header=False)
 
-    print(f"Done! Files saved in /{output_dir}")
+    print(f"Done! Files saved in /{output_dir}\n")
 
 if __name__ == "__main__":
-    generate_synthetic_data(n_assets=50) # Ubah angka ini untuk stress test
+    # 💡 PENGATURAN REPRODUKSI ILMIAH (W4 Tips)
+    # Memastikan data yang dihasilkan selalu konsisten untuk komparasi performa sekuensial vs paralel 
+    np.random.seed(42) 
+    
+    # Skenario 1 (Kecil/Baseline): 50 aset
+    # Skenario 2 (Sedang): 500 aset
+    # Skenario 3 (Besar/Stress Test): 1000 aset
+    generate_synthetic_data(n_assets=1000)

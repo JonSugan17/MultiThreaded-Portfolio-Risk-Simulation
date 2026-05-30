@@ -21,7 +21,8 @@ public:
         const std::vector<double>& weights, 
         const std::vector<std::vector<double>>& cholesky,
         int num_simulations, 
-        double confidence_level);
+        double confidence_level,
+        bool run_sequential = true);
 };
 
 #endif

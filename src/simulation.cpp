@@ -10,7 +10,8 @@ SimulationResult MonteCarloSimulation::runSimulation(
     const std::vector<double>& weights, 
     const std::vector<std::vector<double>>& cholesky,
     int num_simulations, 
-    double confidence_level) {
+    double confidence_level,
+    bool run_sequential) {
     
     int num_assets = means.size();
     if (num_assets == 0) {
@@ -26,9 +27,10 @@ SimulationResult MonteCarloSimulation::runSimulation(
     // ==========================================
     // 1. SEQUENTIAL BASELINE
     // ==========================================
-    double start_seq = omp_get_wtime();
-    std::mt19937 gen_seq(12345); // Seed statis untuk sequential
-    std::normal_distribution<> d_seq(0.0, 1.0);
+    if (run_sequential) {
+        double start_seq = omp_get_wtime();
+        std::mt19937 gen_seq(12345); 
+        std::normal_distribution<> d_seq(0.0, 1.0);
 
     for (int iter = 0; iter < num_simulations; ++iter) {
         double port_return = 0.0;
@@ -49,8 +51,13 @@ SimulationResult MonteCarloSimulation::runSimulation(
 
     // Mengurutkan dan mencari VaR Sekuensial
     std::sort(seq_returns.begin(), seq_returns.end());
-    int var_index = static_cast<int>((1.0 - confidence_level) * num_simulations);
-    result.var_sequential = seq_returns[var_index];
+        int var_index = static_cast<int>((1.0 - confidence_level) * num_simulations);
+        result.var_sequential = seq_returns[var_index];
+    } else {
+        // Jika dilewati, set nilai kosong (nanti akan diisi oleh main.cpp)
+        result.time_sequential = 0.0;
+        result.var_sequential = 0.0;
+    }
 
 
     // ==========================================
@@ -120,7 +127,8 @@ SimulationResult MonteCarloSimulation::runSimulation(
 
     // Mengurutkan dan mencari VaR Paralel
     std::sort(par_returns.begin(), par_returns.end());
-    result.var_parallel = par_returns[var_index];
+        int var_index = static_cast<int>((1.0 - confidence_level) * num_simulations);
+        result.var_parallel = par_returns[var_index];
 
     return result;
 }
