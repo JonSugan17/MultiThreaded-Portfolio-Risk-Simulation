@@ -27,13 +27,11 @@ def generate_synthetic_data(n_assets=10, output_dir="data"):
     try:
         cholesky_matrix = np.linalg.cholesky(corr_matrix)
     except np.linalg.LinAlgError:
-        # Jika matriks gagal didekomposisi karena ketidakakuratan floating-point,
-        # berikan nilai gangguan/jitter sangat kecil pada diagonal utamanya (Ridge Adjustment)
+
         print("[!] Menambahkan jitter numerik kecil untuk menstabilkan matriks korelasi...")
         corr_matrix += np.eye(n_assets) * 1e-8
         cholesky_matrix = np.linalg.cholesky(corr_matrix)
 
-    # Simpan ke CSV
     pd.DataFrame(means, columns=['mean']).to_csv(f"{output_dir}/means.csv", index=False)
     pd.DataFrame(weights, columns=['weight']).to_csv(f"{output_dir}/weights.csv", index=False)
     pd.DataFrame(cholesky_matrix).to_csv(f"{output_dir}/cholesky_matrix.csv", index=False, header=False)
@@ -41,11 +39,7 @@ def generate_synthetic_data(n_assets=10, output_dir="data"):
     print(f"Done! Files saved in /{output_dir}\n")
 
 if __name__ == "__main__":
-    # 💡 PENGATURAN REPRODUKSI ILMIAH (W4 Tips)
     # Memastikan data yang dihasilkan selalu konsisten untuk komparasi performa sekuensial vs paralel 
     np.random.seed(42) 
     
-    # Skenario 1 (Kecil/Baseline): 50 aset
-    # Skenario 2 (Sedang): 500 aset
-    # Skenario 3 (Besar/Stress Test): 1000 aset
     generate_synthetic_data(n_assets=1000)
