@@ -1,6 +1,3 @@
-Berikut adalah versi README.md yang sudah diperbarui dan disesuaikan dengan perintah kompilasi (menggunakan `g++`) serta struktur folder aktual yang ada pada *screenshot* proyek Anda.
-
----
 
 # 🚀 Akselerasi Simulasi Monte Carlo dengan OpenMP untuk Estimasi Value at Risk (VaR)
 
@@ -8,6 +5,13 @@ Berikut adalah versi README.md yang sudah diperbarui dan disesuaikan dengan peri
 
 Proyek ini bertujuan untuk mengakselerasi perhitungan Value at Risk (VaR) pada portofolio investasi multiaset menggunakan Simulasi Monte Carlo yang diparalelkan dengan OpenMP.
 Metode Monte Carlo dikenal memiliki akurasi tinggi dalam estimasi risiko, namun membutuhkan komputasi besar karena melibatkan ribuan hingga jutaan iterasi. Oleh karena itu, komputasi paralel digunakan untuk meningkatkan performa dan efisiensi waktu eksekusi.
+
+## 👨‍💻 Author
+
+* Jonathan Sugan | Ketua + System Architect | 2430305030007
+* Fredrik Danielsen | System Architect + Core Developer | 2430305030027
+* Muhamad Ridha Safari | Core Developer + Dokumentasi | 2430205030031
+* Benaya Abelio | QA + Dokumentasi | 2430305030006
 
 ## 🎯 Tujuan
 
@@ -22,7 +26,7 @@ Metode Monte Carlo dikenal memiliki akurasi tinggi dalam estimasi risiko, namun 
 * **Bahasa Pemrograman:** C++
 * **Parallel Computing:** OpenMP
 * **Compiler:** GCC/G++ (dengan flag `-fopenmp` dan optimasi `-O3`)
-* **Tools Tambahan:** Python (opsional untuk *generate* data/visualisasi)
+* **Tools Tambahan:** Python (untuk *generate* data/visualisasi)
 
 ## 🧠 Konsep Utama
 
@@ -58,7 +62,7 @@ Sebelum menjalankan proyek ini, pastikan sistem Anda memiliki:
 
 * **OS:** Windows / Linux / macOS
 * **Compiler:** G++ dengan dukungan OpenMP
-* **Opsional:** Python 3.8+ (untuk skrip `generate_data.py`)
+* **Generator:** Python 3.8+ (untuk skrip `generate_data.py dan visualization.py`)
 
 Cek ketersediaan G++ dan OpenMP:
 
@@ -69,7 +73,7 @@ g++ --version
 
 ## 🛠️ Cara Kompilasi dan Menjalankan
 
-Proyek ini menggunakan beberapa perintah kompilasi untuk tujuan yang berbeda (program utama, pengujian simulasi, dan *unit test*). Pastikan direktori `bin` sudah terbuat sebelum melakukan kompilasi.
+Proyek ini menggunakan beberapa perintah kompilasi untuk tujuan yang berbeda (program utama, pengujian simulasi, dan *unit test*). Pastikan membuat direktori/folder `bin` sebelum melakukan kompilasi.
 
 **1. Kompilasi Program Utama (VaR Simulation)**
 
@@ -103,10 +107,6 @@ g++ -O3 -fopenmp -Iinclude src/simulation.cpp tests/unit_testing.cpp -o bin/unit
 ```text
 MultiThreaded-Portfolio-Risk-Simulation-3.0-week3/
 │
-├── bin/                        # Folder output hasil kompilasi (.exe / binary)
-│   ├── var_simulation
-│   ├── test_simulation
-│   └── unit_test
 │
 ├── data/                       # Dataset / Parameter input (CSV)
 │   ├── cholesky_matrix.csv
@@ -118,10 +118,10 @@ MultiThreaded-Portfolio-Risk-Simulation-3.0-week3/
 │   └── simulation.hpp
 │
 ├── scripts/                    # Skrip pendukung
+│   ├── visualization.py
 │   └── generate_data.py
 │
 ├── src/                        # Source code utama (C++)
-│   ├── hello_world_omp.cpp
 │   ├── main.cpp
 │   ├── parser.cpp
 │   ├── simulation.cpp
@@ -134,18 +134,3 @@ MultiThreaded-Portfolio-Risk-Simulation-3.0-week3/
 └── README.md                   # Dokumentasi proyek
 
 ```
-
-## 👨‍💻 Author
-
-* Fredrik Danielsen
-* Benaya Abelio
-* Jonathan Sugan
-* Muhamad Ridha Safari
-
-## 💡 Catatan Pengembangan
-
-Proyek ini dapat dikembangkan lebih lanjut dengan:
-
-* Implementasi akselerasi GPU (CUDA/OpenCL).
-* Integrasi *pipeline* data *real-time* untuk pengambilan harga aset langsung dari API finansial.
-* Visualisasi distribusi VaR otomatis menggunakan Python/Matplotlib setelah simulasi C++ selesai dijalankan.
