@@ -22,9 +22,7 @@ int main() {
 
         std::cout << "Data berhasil dimuat. Jumlah aset: " << means.size() << std::endl;
 
-        // ==========================================
         // PENGATURAN PARAMETER SIMULASI
-        // ==========================================
         int num_simulations = 100000;   
         double confidence_level = 0.95; 
 
@@ -35,9 +33,7 @@ int main() {
         // Daftar jumlah thread yang akan diuji
         std::vector<int> thread_counts = {1, 2, 4, 8};
 
-        // ==========================================
         // LOOP PENGUJIAN BENCHMARK MULTI-THREAD
-        // ==========================================
         double cached_seq_time = 0.0;
         double cached_seq_var = 0.0;
 
