@@ -20,9 +20,7 @@ void setup_dummy_data(std::vector<double>& means, std::vector<double>& weights, 
     };
 }
 
-// ----------------==================================----------------
 // 1. SMOKE TEST: Memastikan fungsi berjalan tanpa crash
-// ----------------==================================----------------
 void test_smoke() {
     TEST_CONTEXT("Test 1: Smoke Test");
     std::vector<double> means, weights;
@@ -37,9 +35,7 @@ void test_smoke() {
     }
 }
 
-// ----------------==================================----------------
 // 2. CORRECTNESS TEST: Cek keselarasan paralel vs sekuensial
-// ----------------==================================----------------
 void test_correctness() {
     TEST_CONTEXT("Test 2: Correctness Test (Parallel == Sequential)");
     std::vector<double> means, weights;
@@ -62,9 +58,7 @@ void test_correctness() {
     }
 }
 
-// ----------------==================================----------------
 // 3. EDGE CASE TEST: Input Kosong (N = 0 Aset)
-// ----------------==================================----------------
 void test_empty_input() {
     TEST_CONTEXT("Test 3: Edge Case (Empty Input / Zero Assets)");
     std::vector<double> empty_means;
@@ -75,15 +69,13 @@ void test_empty_input() {
         MonteCarloSimulation::runSimulation(empty_means, empty_weights, empty_cholesky, 1000, 0.95);
         TEST_FAIL("Program tidak melempar exception saat diberikan input kosong.");
     } catch (const std::invalid_argument& e) {
-        TEST_PASS(); // Ekspektasi terpenuhi
+        TEST_PASS();
     } catch (...) {
         TEST_FAIL("Melemparkan tipe exception yang salah (bukan invalid_argument).");
     }
 }
 
-// ----------------==================================----------------
 // 4. EDGE CASE TEST: N = 1 (Simulasi Tunggal)
-// ----------------==================================----------------
 void test_single_simulation() {
     TEST_CONTEXT("Test 4: Edge Case (N = 1 Simulation)");
     std::vector<double> means, weights;
@@ -103,9 +95,7 @@ void test_single_simulation() {
     }
 }
 
-// ----------------==================================----------------
 // 5. STRESS TEST & FAULT TOLERANCE CHECK
-// ----------------==================================----------------
 void test_large_simulation_and_faults() {
     TEST_CONTEXT("Test 5: Stress Test (N = 1 Juta) & Fault Tolerance");
     std::vector<double> means, weights;
