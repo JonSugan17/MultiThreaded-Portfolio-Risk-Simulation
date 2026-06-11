@@ -22,7 +22,7 @@ def create_comprehensive_dashboard_v4():
     fig, axes = plt.subplots(3, 2, figsize=(18, 16))
     
     # Judul Global Dashboard (Paling Atas)
-    fig.suptitle('DASHBOARD ANALISIS KOMPREHENSIF MINGGU 4:\nSIMULASI MONTE CARLO VaR & PERFORMA OPENMP (TOTAL 1.000 ASET)', 
+    fig.suptitle('DASHBOARD ANALISIS KOMPREHENSIF:\nSIMULASI MONTE CARLO VaR & PERFORMA OPENMP (TOTAL 1.000 ASET)', 
                  fontsize=20, fontweight='bold', y=0.97, color='#2c3e50')
 
     # Pemetaan Sumbu (Axes)
@@ -158,7 +158,7 @@ def create_comprehensive_dashboard_v4():
     plt.tight_layout(rect=[0, 0.02, 1, 0.94])
     
     # Simpan di folder data
-    output_dashboard_path = 'data/dashboard_laporan_v4.png'
+    output_dashboard_path = 'data/dashboard_laporan_v5.png'
     if not os.path.exists("data"):
         os.makedirs("data")
         
