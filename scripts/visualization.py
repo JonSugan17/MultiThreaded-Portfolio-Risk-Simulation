@@ -163,7 +163,7 @@ def create_comprehensive_dashboard_v4():
         os.makedirs("data")
         
     plt.savefig(output_dashboard_path, dpi=150)
-    print(f"[SUCCESS] Dashboard 5-in-1 Minggu 4 berhasil dibuat dan disimpan di '{output_dashboard_path}'")
+    print(f"[SUCCESS] Dashboard 5-in-1 Minggu 5 berhasil dibuat dan disimpan di '{output_dashboard_path}'")
     plt.show()
 
 if __name__ == "__main__":
